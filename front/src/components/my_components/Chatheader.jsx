@@ -21,7 +21,7 @@ export function ChatHeader({onDeleteAllClick, onCloseChat}) {
     <>
     <div className="flex h-20 p-2 shadow-md justify-start items-center relative bg-gray-200">
           <div className="bg-gray-200 rounded-full	h-12 w-12">
-            <img className="w-12" src={recipientUser ? usericon : null} alt="" />
+            <img className={recipientUser?.profileImage ? "rounded-full h-12 w-14 object-cover":"w-12"} src={recipientUser ? recipientUser?.profileImage || usericon : null} alt="" />
           </div>
           <div className="ml-4 text-xl font-semibold">{recipientUser?.name}</div>
           <div className="absolute top-4 right-4">

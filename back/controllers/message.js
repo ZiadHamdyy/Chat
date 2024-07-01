@@ -1,13 +1,15 @@
 const { log } = require("console")
 const messageDB = require("../mongoDB/message")
-
+const groupDB = require("../mongoDB/group");
+const userDB = require("../mongoDB/user")
 const createmessage = async (req, res) => {
-    const {text, senderId, senderName, chatId} = req.body
-    const message = new messageDB({text, senderId, senderName, chatId})
-
+    const {text, senderName, chatId} = req.body
+    const user = req.user
     try{
+        const message = new messageDB({text, senderId: user._id, senderName, chatId})
         const response = await message.save()
         res.status(200).json(response)
+        console.log(response);
     }catch(error){
         console.log(error)
         res.status(500).json(error)

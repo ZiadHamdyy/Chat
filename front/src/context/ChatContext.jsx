@@ -43,7 +43,6 @@ export const ChatContextProvider = ({children, user}) => {
                 }
                 setUserChats(response)
             }
-            
         }
         getUserChats()
     },[user])
@@ -110,11 +109,11 @@ export const ChatContextProvider = ({children, user}) => {
         getMessages()
     },[currentChat])
 
-    const newMessage = useCallback(async (text, senderId, senderName, chatId, setTextMessage) => {
+    const newMessage = useCallback(async (text, senderName, chatId, setTextMessage) => {
         if(!text){
             return console.log("Message cannot be empty");
         }
-        const response = await postRequest(`${url}/messages/createmessage`, JSON.stringify({text, senderId, senderName, chatId}))
+        const response = await postRequest(`${url}/messages/createmessage`, JSON.stringify({text, senderName, chatId}))
         if(response.error){
             return setNewMessageError(response)
         }

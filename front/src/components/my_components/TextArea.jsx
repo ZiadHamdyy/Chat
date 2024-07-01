@@ -21,7 +21,7 @@ export function TextArea() {
 
   const handleSendOnCKlick = () => {
     if(currentChat)
-      newMessage(message, user._id, user.name, currentChat?._id, setMessage)
+      newMessage(message, user.name, currentChat?._id, setMessage)
     setShowPicker()
   }
 

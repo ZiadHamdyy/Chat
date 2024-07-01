@@ -11,7 +11,7 @@ export function EditTextArea( { onClose } ) {
   const [showPicker, setShowPicker] = useState(false);
   const {editMessage, currentMessage, currentChat } = useContext(ChatContext)
   const { setGroupMessages, currentGroup, editGroupMessage } = useContext(GroupContext)
-  const [message, setMessage] = useState(currentMessage?.text);
+  const [message, setMessage] = useState(currentMessage?.text || "");
   useEffect(() => {
       setMessage(currentMessage?.text);
   }, [currentMessage]);

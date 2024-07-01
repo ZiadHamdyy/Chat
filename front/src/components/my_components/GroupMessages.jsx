@@ -8,10 +8,12 @@ import { MessageDropdownMenuDemo } from "../ui/MessageDropdownMenu";
 import { GroupContext } from "../../../src/context/GroupContext";
 
 export function GetGroupMessages({ onEditClick, onDeleteClick }) {
-    const { setCurrentMessage,currentChat } = useContext(ChatContext);
-  const { groupmessages } = useContext(GroupContext);
+    const { setCurrentMessage, currentChat } = useContext(ChatContext);
+  const { groupmessages, admin } = useContext(GroupContext);
   const { user } = useContext(AuthContext);
   const messagesEndRef = useRef(null);
+
+  console.log(groupmessages);
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [groupmessages]);
@@ -24,14 +26,15 @@ export function GetGroupMessages({ onEditClick, onDeleteClick }) {
             key={msg._id}
             /* onClick={() => setCurrentMessage(msg)} */
             className="bg-gray-200  mx-6 my-2 text-gray-300 flex h-auto w-5/5"
+            onClick={() => {user._id === admin && setCurrentMessage(msg)}}
           >
             <div className="bg-gray-200 rounded-full h-8 w-8 mt-2">
-              <img className="w-8" src={usericon} alt="" />
+              <img className={msg?.profileImage ? "rounded-full h-8 w-8 object-cover":"w-8"} src={ msg?.profileImage|| usericon } alt="" />
             </div>
             <div className="bg-gray-900 rounded-xl mb-2 ml-2 shadow-sm max-w-lg h-auto">
               <div className="flex items-center w-full h-8 justify-between" >
               <div className="px-2 py-1 text-sky-400">{msg.senderName}</div>
-              {/* <MessageDropdownMenuDemo onEditClick={ onEditClick }/> */}
+              {user._id === admin && <MessageDropdownMenuDemo onEditClick={ onEditClick } onDeleteClick={onDeleteClick}/>}
               </div>
               <div className="px-2 overflow-hidden overflow-ellipsis whitespace-no-wrap break-words">
                 {msg?.text}
@@ -58,7 +61,7 @@ export function GetGroupMessages({ onEditClick, onDeleteClick }) {
               </div>
             </div>
             <div className="bg-gray-200 rounded-full h-8 w-8 mt-2">
-              <img className="w-8" src={usericon} alt="" />
+              <img className={msg?.profileImage ? "rounded-full h-8 w-8 object-cover":"w-8"} src={msg?.profileImage|| usericon} alt="" />
             </div>
           </div>
         )

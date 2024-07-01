@@ -22,7 +22,7 @@ export function GroupTextArea() {
 
   const handleSendOnCKlick = () => {
     if(currentGroup)
-      newgroupMessage(message, user._id, user.name, currentGroup?._id, setMessage)
+      newgroupMessage(message, user.name, currentGroup?._id, setMessage)
     setShowPicker()
   }
   const handleKeyPress = (e) => {

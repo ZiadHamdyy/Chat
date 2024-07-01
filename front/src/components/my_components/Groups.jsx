@@ -12,7 +12,7 @@ function Getgroup({group}) {
   return (
     <>
       <div className="rounded-full	h-12 w-14  ml-2 bg-gray-200">
-        <img className="w-12" src={usericon} alt="" />
+        <img className={group?.profileImage ? "rounded-full h-12 w-14 object-cover":"w-12"} src={ group?.profileImage || usericon} alt="" />
       </div>
       <div className="flex flex-col items-start w-full">
         <div className="mx-4 text-xl">{group?.name}</div>

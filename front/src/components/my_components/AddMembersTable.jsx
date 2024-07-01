@@ -5,31 +5,39 @@ import {
   TableCell,
   TableBody,
   Table,
-} from "./table";
+} from "../ui/table";
 import usericon from "../../picture/user (2).png";
-import { Button } from "./button";
-import { Input } from "./input";
+import { Button } from "../ui/button";
+import { Input } from "../ui/input";
 import { useContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { ChatContext } from "../../context/ChatContext.jsx";
 import { AuthContext } from "../../context/AuthContext.jsx";
+import { GroupContext } from "../../../src/context/GroupContext.jsx";
 
-export function UsersTable() {
-  const { availableChats } = useContext(ChatContext);
+export function AddMembersTable() {
+  const { members, currentGroup, availableMembers } = useContext(GroupContext)
   const navigate = useNavigate();
   const [filteredMembers, setFilteredMembers] = useState([]);
   const [input, setInput] = useState("");
 
   useEffect(() => {
+    console.log("Members:", availableMembers);
+    console.log("Current Group Members:", currentGroup.members);
+    const nonGroupMembers = availableMembers.filter(
+      (member) => !currentGroup.members.some((groupMember) => groupMember._id === member._id)
+    );
+
+    console.log("nonGroupMembers", nonGroupMembers);
     if (input.trim() === "") {
-      setFilteredMembers(availableChats);
+      setFilteredMembers(nonGroupMembers);
     } else {
-      const filtered = availableChats.filter((member) =>
+      const filtered = nonGroupMembers.filter((member) =>
         member.name.toLowerCase().startsWith(input.toLowerCase())
       );
       setFilteredMembers(filtered);
     }
-  }, [input, availableChats]);
+  }, [input, members, currentGroup]);
 
   const switchToHome = () => navigate("/");
 
@@ -47,7 +55,7 @@ export function UsersTable() {
           <TableRow>
             <TableHead className="w-[80px]">Image</TableHead>
             <TableHead>Name</TableHead>
-            <TableHead>Chat</TableHead>
+            <TableHead>Add to group</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -62,20 +70,18 @@ export function UsersTable() {
 }
 
 function Member({ member, switchToHome }) {
-  const {user, getUserInfo} = useContext(AuthContext)
-  const { createChat } = useContext(ChatContext)
-
-  const handleCreateChat = () => {
-    createChat(user._id, member._id);
+  const { addMember } = useContext(GroupContext);
+  const {getUserInfo, user} = useContext(AuthContext)
+  console.log("member",member);
+  const handleAddMembers = () => {
+    addMember(member._id, member.name, member.profileImage);
     switchToHome();
   };
-
   useEffect(() => {
     if (user && user._id) {
       getUserInfo(user._id);
     }
   }, [user?._id, getUserInfo]);
-
   return (
     <TableRow>
       <TableCell>
@@ -96,9 +102,9 @@ function Member({ member, switchToHome }) {
         <Button
           className="rounded-full text-primary-foreground"
           variant="secondary"
-          onClick={() => handleCreateChat()}
+          onClick={handleAddMembers}
         >
-          Chat
+          Add
         </Button>
       </TableCell>
     </TableRow>

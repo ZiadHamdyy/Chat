@@ -3,10 +3,10 @@ import usericon from '../../picture/user (2).png';
 import React, { useContext, useState } from 'react';
 import { Input } from './input';
 import { Label } from './label';
-import { AuthContext } from '../../../src/context/AuthContext.jsx';
+import { GroupContext } from '../../../src/context/GroupContext';
 
-export function InputFile() {
-  const {profileImage , handleFileChange } = useContext(AuthContext);
+export function InputGroupFile() {
+  const {profileImage , handleFileChange } = useContext(GroupContext);
   const [file, setFile] = useState("");
   const [image , setImage] = useState("")
   const previewFiles = (file) => {

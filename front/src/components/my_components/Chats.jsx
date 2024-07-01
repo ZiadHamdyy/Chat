@@ -15,7 +15,7 @@ function GetChat({ chat, user }) {
   return (
     <>
       <div className="rounded-full	h-12 w-14  ml-2 bg-gray-200">
-        <img className="w-12" src={usericon} alt="" />
+        <img className={recipientUser?.profileImage ? "rounded-full h-12 w-14 object-cover":"w-12"} src={recipientUser?.profileImage || usericon} alt="" />
       </div>
       <div className="flex flex-col items-start w-full">
         <div className="mx-4 text-xl">{recipientUser?.name}</div>
@@ -27,6 +27,7 @@ function GetChat({ chat, user }) {
     </>
   );
 }
+
 export function GetChats() {
   const { userChats, userChatsLoading, userChatsError, setCurrentChat, currentChat } =
     useContext(ChatContext);
@@ -36,6 +37,8 @@ export function GetChats() {
       toast(userChatsError.message);
     }
   }, [userChatsError]);
+
+
   return (
     <>
       {userChatsLoading ? (

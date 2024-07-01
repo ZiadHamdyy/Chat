@@ -11,7 +11,9 @@ import {
     DropdownMenuTrigger,
   } from "../../components/ui/dropdown-menu"
   import menuicon from "../../picture/more.png";
-  export function GroupDropdownMenuDemo() {
+import { useContext } from "react";
+import { GroupContext } from "../../../src/context/GroupContext";
+  export function GroupDropdownMenuDemo({onDeleteMessages, onCloseGroup}) {
     return (
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
@@ -19,11 +21,11 @@ import {
         </DropdownMenuTrigger>
         <DropdownMenuContent className="w-44">
           <DropdownMenuGroup>
-            <DropdownMenuItem>
+            <DropdownMenuItem onClick={onCloseGroup}>
               <DeleteIcon className="mr-2 h-4 w-4" />
               <span>Close Group</span>
             </DropdownMenuItem>
-            <DropdownMenuItem>
+            <DropdownMenuItem onClick={onDeleteMessages}>
               <Delete className="mr-2 h-4 w-4"/>
               <span>Delete Group Messages</span>
             </DropdownMenuItem>
