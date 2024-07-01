@@ -1,5 +1,6 @@
 import {createContext,  useCallback,  useEffect, useState } from "react";
 import { deleteRequest, getRequest, postRequest, putRequest, url } from "../utils/services";
+import { useNavigate } from "react-router-dom";
 
 export const GroupContext = createContext()
 
@@ -13,16 +14,22 @@ export const GroupContextProvider = ({children, user}) => {
     const [groupmessages, setGroupMessages] = useState(null)
     const [groupmessagesLoading, setGroupMessagesLoading] = useState(false)
     const [groupmessagesError, setGroupMessagesError] = useState(null)
-    // eslint-disable-next-line
+    const [createNewLoading, setCreateNewGroupLoading] = useState(null)
+    const [createNewError, setCreateNewGroupError] = useState(null)
     const [createNewMessage, setCreateNewGroupMessage] = useState(null)
-    // eslint-disable-next-line
     const [newMessageError, setNewGroupMessageError] = useState(null)
+    const [availableMembers, setAvailableMembers] = useState([])
     const [members, setMembers] = useState([])
+    const [admin, setAdmin] = useState(null)
     const [currentMember, setCurrentMember] = useState([])
     const [membersError, setMembersError] = useState([])
     const [membersLoading, setMembersLoading] = useState([])
     const [editGroupMessageError, setEditGroupMessageError] = useState(null);
     const [deleteGroupMessageError, setDeleteGroupMessageError] = useState(null);
+    const [profileImage, setProfileImage] = useState(null)
+
+    const navigate = useNavigate();
+    const switchToHome = () => navigate("/");
     useEffect(() => {
         const getUserGroups = async () =>{
             if(user?._id){
@@ -40,12 +47,17 @@ export const GroupContextProvider = ({children, user}) => {
     },[user])
 
     const createGroup = useCallback(async (name, members) => {
-        const response = await postRequest(`${url}/groups/creategroup/${user?._id}`, JSON.stringify({name, members}))
+        setCreateNewGroupLoading(true)
+        setCreateNewGroupError(null)
+        const response = await postRequest(`${url}/groups/creategroup/${user?._id}`, JSON.stringify({name, profileImage, members}))
+        setCreateNewGroupLoading(false)
         if(response.error){
-            return console.log(response)
+            return setCreateNewGroupError(response)
         }
+        setCreateNewGroupError(null)
         setUserGroups((prev) => [...prev, response])
-    },[user?._id])
+        switchToHome();
+    },[user?._id, profileImage])
 
     useEffect(() => {
         const getGroupMessages = async () =>{
@@ -61,11 +73,11 @@ export const GroupContextProvider = ({children, user}) => {
         getGroupMessages()
     },[currentGroup])
 
-    const newgroupMessage = useCallback(async (text, senderId, senderName, chatId, setTextMessage) => {
+    const newgroupMessage = useCallback(async (text, senderName, chatId, setTextMessage) => {
         if(!text){
             return console.log("Message cannot be empty");
         }
-        const response = await postRequest(`${url}/messages/createmessage`, JSON.stringify({text, senderId, senderName, chatId}))
+        const response = await postRequest(`${url}/groups/createmessage`, JSON.stringify({text, senderName, chatId}))
         if(response.error){
             return setNewGroupMessageError(response)
         }
@@ -77,7 +89,6 @@ export const GroupContextProvider = ({children, user}) => {
     useEffect(() => {
         const getGroupMembers = async () =>{
             if(currentGroup?._id){
-                console.log(currentGroup?._id);
                 setMembersLoading(true)
                 setMembersError(null)
                 const response = await getRequest(`${url}/groups/getgroupmembers/${currentGroup?._id}`)
@@ -85,11 +96,35 @@ export const GroupContextProvider = ({children, user}) => {
                 if(response.error){
                     return setMembersError(response)
                 }
-                setMembers(response)
+                setAdmin(response.admin)
+                setMembers(response.members)
             }
         }
             getGroupMembers()
     },[currentGroup])
+
+    useEffect(() => {
+        const fetchAvailableMembers = async () => {
+          try {
+            const response = await getRequest(`${url}/users/`);
+            if (response.error) {
+              console.log(response);
+              return;
+            }
+    
+            const filteredMembers = response.filter((member) => {
+              let isMemberInGroup = members.some((groupMember) => groupMember._id === member._id);
+              return !isMemberInGroup;
+            });
+    
+            setAvailableMembers(filteredMembers);
+          } catch (error) {
+            console.error("Error fetching available members:", error);
+          }
+        };
+    
+        fetchAvailableMembers();
+      }, [members]);
 
     const deleteGroupMessage = useCallback(async (messageId) => {
         if (messageId) {
@@ -114,8 +149,62 @@ export const GroupContextProvider = ({children, user}) => {
         }
     }, [])
 
+    const addMember = useCallback(async (memberId, name, profileImage) => {
+        const response = await postRequest(`${url}/groups/addmember/${currentGroup?._id}`, JSON.stringify({memberId, name, profileImage}))
+        if(response.error){
+            return setMembersError(response)
+        }
+        setMembers(response.members)
+    },[currentGroup?._id])
+
+    const RemoveMember = useCallback(async (memberId) => {
+        const response = await deleteRequest(`${url}/groups/removemember/${currentGroup?._id}`, JSON.stringify({memberId}))
+        if(response.error){
+            return setMembersError(response)
+        }
+        setMembers((prevMembers) => prevMembers.filter((member) => member._id !== memberId));
+    },[currentGroup?._id])
+
+    const leaveMember = useCallback(async (memberId) => {
+        const response = await deleteRequest(`${url}/groups/leavemember/${currentGroup?._id}`, JSON.stringify({memberId}))
+        if(response.error){
+            return setMembersError(response)
+        }
+        setCurrentGroup(null)
+        setMembers((prevMembers) => prevMembers.filter((member) => member._id !== memberId));
+    },[currentGroup?._id])
+
+    const deleteGroup = useCallback(async () => {
+        const response = await deleteRequest(`${url}/groups/deletegroup/${currentGroup?._id}`);
+        if(response.error){
+            return console.log(response);
+        }
+        setCurrentGroup(null)
+        setGroupMessages([]);
+        setUserGroups((prev) => prev.filter((group) => group._id !== currentGroup?._id));
+    }, [currentGroup, setUserGroups]);
+
+    const deleteAllGroupMessages = useCallback(async () => {
+        const response = await deleteRequest(`${url}/groups/deleteallgroupmessages/${currentGroup?._id}`);
+        if(response.error){
+            return console.log(response);
+        }
+        setGroupMessages([]);
+        console.log(response.message);
+    }, [currentGroup]);
+
+    const handleFileChange = useCallback((e) => {
+        const file = e.target.files[0];
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onloadend = () => {
+            const imageResult = reader.result;
+            setProfileImage(imageResult);
+        };
+    }, []);
+
     return (
-    <GroupContext.Provider value={{deleteGroupMessage, editGroupMessage, currentMember, setCurrentMember, members, newgroupMessage, groupmessages, setGroupMessages, groupmessagesLoading, groupmessagesError, createGroup, userGroups, userGroupsError, userGroupsLoading, currentGroup, setCurrentGroup}}>
+    <GroupContext.Provider value={{createNewError, createNewLoading, handleFileChange, profileImage, availableMembers, deleteAllGroupMessages, deleteGroup, admin, leaveMember, RemoveMember, addMember, deleteGroupMessage, editGroupMessage, currentMember, setCurrentMember, members, newgroupMessage, groupmessages, setGroupMessages, groupmessagesLoading, groupmessagesError, createGroup, userGroups, userGroupsError, userGroupsLoading, currentGroup, setCurrentGroup}}>
         {children}
     </GroupContext.Provider>
     )

@@ -1,4 +1,5 @@
 const express = require("express")
+const AuthToken = require('../Middlewares/JWT.js');
 
 const { createChat, findUserChats , findChat, deleteChat} = require("../controllers/chat")
 const router = express.Router()

@@ -4,7 +4,8 @@ const messageSchema = new mongoose.Schema({
     text: String,
     senderId: String,
     senderName: String,
-    chatId: String
+    chatId: String,
+    profileImage: { type: String },
 },{
     timestamps: true
 })

@@ -9,11 +9,19 @@ import { GroupContext } from "../../../src/context/GroupContext";
 
 export function GetMessages({ onEditClick, onDeleteClick }) {
   const { messages, currentChat, setCurrentMessage } = useContext(ChatContext);
-  const { user } = useContext(AuthContext);
+  const { user, getUserInfo } = useContext(AuthContext);
+  const { recipientUser } = RecipientUser(currentChat, user);
   const messagesEndRef = useRef(null);
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
+
+
+  useEffect(() => {
+    if (user && user._id) {
+      getUserInfo(user._id);
+    }
+  }, [user?._id, getUserInfo]);
 
   return (
     <>
@@ -25,7 +33,7 @@ export function GetMessages({ onEditClick, onDeleteClick }) {
             className="bg-gray-200  mx-6 my-2 text-gray-300 flex h-auto w-5/5"
           >
             <div className="bg-gray-200 rounded-full h-8 w-8 mt-2">
-              <img className="w-8" src={usericon} alt="" />
+              <img className={recipientUser?.profileImage ? "rounded-full h-8 w-8 object-cover":"w-8"} src={recipientUser?.profileImage || usericon} alt="" />
             </div>
             <div className="bg-gray-900 rounded-xl mb-2 ml-2 shadow-sm max-w-lg h-auto">
               <div className="flex items-center w-full h-8 justify-between" >
@@ -57,7 +65,7 @@ export function GetMessages({ onEditClick, onDeleteClick }) {
               </div>
             </div>
             <div className="bg-gray-200 rounded-full h-8 w-8 mt-2">
-              <img className="w-8" src={usericon} alt="" />
+              <img className={user?.profileImage ? "rounded-full h-8 w-8 object-cover":"w-8"} src={user?.profileImage || usericon} alt="" />
             </div>
           </div>
         )

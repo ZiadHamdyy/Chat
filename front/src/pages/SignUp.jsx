@@ -1,9 +1,8 @@
-import usericon from '../picture/user (2).png';
 import appicon from '../picture/meetme.png';
 import { Button } from '../components/ui/button.jsx';
 import { InputFile } from '../components/ui/File.jsx';
 import { InputWithLabel } from '../components/ui/InputWithLabel.jsx';
-import { useContext, useEffect, useState } from 'react';
+import { useContext, useEffect } from 'react';
 import { AuthContext } from '../context/AuthContext.jsx';
 import { Toaster, toast } from "sonner"
 import React from 'react';
@@ -21,7 +20,7 @@ export default function Signup(/* { switchToLogin } */){
     }
   }, [registerError]);
   const switchToLogin = () => {navigate('/login');setRegisterError(null)};
-  const [imageSrc, setImageSrc] = useState('');
+/*   const [imageSrc, setImageSrc] = useState('');
   const [imageBinary, setImageBinary] = useState('');
 
   const handleFileSelect = (file) => {
@@ -29,17 +28,17 @@ export default function Signup(/* { switchToLogin } */){
       const reader = new FileReader();
       reader.onloadend = () => {
         const base64String = reader.result.split(',')[1];
-        setImageSrc(reader.result); // For displaying the image
-        setImageBinary(base64String); // For saving in the database
-        updateRegisterInfo({ ...registerInfo, profileImage: base64String }); // Update registerInfo with image
+        setImageSrc(reader.result);
+        setImageBinary(base64String);
+        updateRegisterInfo({ ...registerInfo, profileImage: base64String });
       };
       reader.readAsDataURL(file);
     } else {
       setImageSrc('');
       setImageBinary('');
     }
-  };
-    return (
+  };*/
+  return (
         <>
           <Toaster/>
           <div className="bg-gray-300 w-4/12 flex justify-center items-center flex-col flex-wrap p-8">
@@ -54,14 +53,14 @@ export default function Signup(/* { switchToLogin } */){
           </div>
           <div className="bg-gray-200 w-8/12 flex flex-col flex-wrap justify-center items-center px-8 pb-8">
             <div className="w-80 h-64 flex justify-center items-center flex-col">
-              <div className="bg-gray-200 rounded-full	h-36 w-36">
+              {/* <div className="bg-gray-200 rounded-full	h-36 w-36">
               {imageSrc ? (
               <img className="w-34 rounded-full" src={imageSrc} alt="Selected" onChange={(e) => updateRegisterInfo( {...registerInfo, profileImage: imageBinary})}/>
             ) : (
               <img className="w-34" src={usericon} alt="Placeholder" onChange={(e) => updateRegisterInfo( {...registerInfo, profileImage: imageBinary})}/>
             )}
-              </div>
-              <div><InputFile onFileSelect={handleFileSelect} /></div> 
+              </div> */}
+              <div><InputFile /* onFileSelect={handleFileSelect} *//></div>
             </div>
               <div className="w-full h-2/6 flex flex-col flex-wrap justify-between items-center">
                   <InputWithLabel textname="name" onChange={(e) => updateRegisterInfo( {...registerInfo, name: e.target.value})}/>

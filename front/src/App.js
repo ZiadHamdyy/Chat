@@ -10,6 +10,7 @@ import { Route, Routes, Navigate } from 'react-router-dom';
 import { ChatContextProvider } from './context/ChatContext.jsx';
 import Users from './pages/Users.jsx';
 import Groups from './pages/Groups.jsx';
+import AddMembers from './pages/AddMembers.jsx';
 import { GroupContextProvider } from './context/GroupContext.jsx';
 function App() {
   const {user} = useContext(AuthContext)
@@ -28,8 +29,9 @@ function App() {
           <Route path='/signup' element={user ? <Navigate to="/" /> : <Signup />} />
           <Route path='/login' element={user ? <Navigate to="/" /> : <LogIN />} />
           <Route path='/profile' element={user ? <Profile /> : <Navigate to="/"/>} />
-          <Route path='/Users' element={user ? <Users /> : <Navigate to="/"/>} />
-          <Route path='/Groups' element={user ? <Groups /> : <Navigate to="/"/>} />
+          <Route path='/users' element={user ? <Users /> : <Navigate to="/"/>} />
+          <Route path='/groups' element={user ? <Groups /> : <Navigate to="/"/>} />
+          <Route path='/addmembers' element={user ? <AddMembers /> : <Navigate to="/"/>} />
           <Route path='*' element={<Navigate to="/" />} />
         </Routes>
     </div>

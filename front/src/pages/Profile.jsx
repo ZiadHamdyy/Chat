@@ -1,51 +1,110 @@
-import React, { useContext } from 'react';
-import { InputFile } from '../components/ui/File.jsx';
-import usericon from '../picture/user (2).png';
-import { InputWithLabel } from '../components/ui/InputWithLabel.jsx';
-import { Button } from '../components/ui/button.jsx';
-import { AuthContext } from '../context/AuthContext.jsx';
+import React, { useContext, useEffect, useState } from "react";
+import { InputProfileFile } from "../components/ui/ProfileFile.jsx";
+import { InputWithLabel } from "../components/ui/InputWithLabel.jsx";
+import { Button } from "../components/ui/button.jsx";
+import { AuthContext } from "../context/AuthContext.jsx";
+import { Toaster, toast } from "sonner"
 
-export default function Profile(){
-  const { registerInfo, updateRegisterInfo, registerUser, registerLoading, user } = useContext(AuthContext)
+export default function Profile() {
+  const { user, getUserInfo, UpdateUser, profileImage, UpdatePassword, updateDataError, deleteUser } =
+    useContext(AuthContext);
+  const [showChangePass, setShowChangePass] = useState(false);
 
-/*   const byteCharacters = atob(user.profileImage);
-const byteNumbers = new Array(byteCharacters.length);
-for (let i = 0; i < byteCharacters.length; i++) {
-    byteNumbers[i] = byteCharacters.charCodeAt(i);
-}
-const byteArray = new Uint8Array(byteNumbers);
-const blob = new Blob([byteArray], { type: 'image/png' });
+  const [name, setName] = useState(user?.name || "");
+  const [email, setEmail] = useState(user?.email || "");
+  const [oldPassword, setOldPassword] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  console.log(oldPassword);
+  console.log(newPassword);
+  useEffect(() => {
+    if (user && user._id) {
+      getUserInfo(user._id);
+    }
+  }, [user, user?._id, getUserInfo]);
 
-// Create a URL for the Blob
-const url = URL.createObjectURL(blob);
+  useEffect(() => {
+    setName(user?.name || "");
+    setEmail(user?.email || "");
+  }, [user]);
 
-// Create an Image element
-const img = new Image();
+  useEffect(() => {
+    setOldPassword("");
+    setNewPassword("");
+  }, [user]);
 
-// Set the source of the Image element to the created URL
-img.src = url;
-let p
-if(img.src){
-  p= url;
-}else{p = usericon} */
+  useEffect(() => {
+    if (updateDataError?.error) {
+      toast(updateDataError.message);
+    }
+  }, [updateDataError]);
   return (
     <>
+    <Toaster/>
       <div className="bg-gray-200 w-full flex flex-col flex-wrap justify-center items-center px-8 pb-8">
-            <div className="w-80 h-64 flex justify-center items-center flex-col">
-              <div className="bg-gray-200 rounded-full	h-36 w-36">
-                <img className="w-34 rounded-full" src={usericon} alt="" />
-              </div>
-              <div><InputFile/></div> 
+        {!showChangePass && (
+          <div className="h-48 w-full mt-10">
+            <InputProfileFile /* onFileSelect={handleFileSelect} */ />
+          </div>
+        )}
+        {!showChangePass && (
+          <div className="w-full h-2/6 flex flex-col flex-wrap justify-evenly items-center">
+            <InputWithLabel
+              textname={user.name}
+              onChange={(e) => setName(e.target.value)}
+            />
+            <InputWithLabel
+              textname={user.email}
+              onChange={(e) => setEmail(e.target.value)}
+            />
+          </div>
+        )}
+        {showChangePass && (
+          <InputWithLabel textname="Old Password" className="mt-10" onChange={(e) => setOldPassword(e.target.value)}/>
+        )}
+        {showChangePass && (
+          <InputWithLabel textname="New Password" className="mt-10 mb-10" onChange={(e) => setNewPassword(e.target.value)}/>
+        )}
+        <div className="flex flex-col w-4/12">
+          {!showChangePass && (
+            <Button
+              className=""
+              onClick={() => {
+                UpdateUser(name, email, profileImage);
+              }}
+            >
+              Confirm Changes
+            </Button>
+          )}
+          {showChangePass && (
+            <Button
+              className="mt-10"
+              onClick={() => {
+                UpdatePassword(oldPassword, newPassword);
+              }}
+            >
+              Confirm Changes
+            </Button>
+          )}
+          {showChangePass && (
+            <Button className="mt-10" onClick={() => setShowChangePass(false)}>
+              Change Profile
+            </Button>
+          )}
+          {!showChangePass && (
+            <div className="flex justify-evenly">
+              {
+                <Button
+                  className="mt-10"
+                  onClick={() => setShowChangePass(true)}
+                >
+                  Change Password
+                </Button>
+              }
+              <Button className="mt-10" onClick={() => deleteUser()}>Delete Profile</Button>
             </div>
-              <div className="w-full h-2/6 flex flex-col flex-wrap justify-between items-center">
-                  <InputWithLabel labeltext={user.name} textname="Change name" onChange={(e) => updateRegisterInfo( {...registerInfo, name: e.target.value})}/>
-                  <InputWithLabel labeltext={user.email} textname="Change email" onChange={(e) => updateRegisterInfo( {...registerInfo, email: e.target.value})}/>
-                  <InputWithLabel labeltext="Can't show your password for safety" textname="Change Password" onChange={(e) => updateRegisterInfo( {...registerInfo, password: e.target.value})}/>
-              </div>
-  
-                <Button className="w-6/12 mt-10" onClick={/* switchToLogin */registerUser}>{registerLoading ? "Loading" : "Confirm Changes"}</Button>
-                
-            </div>
+          )}
+        </div>
+      </div>
     </>
   );
 }
